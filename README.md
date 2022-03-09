@@ -51,7 +51,7 @@ export interface Pool {
 export const getPoolInfo = async (poolAddress: string): Pool => {
   const pool = getContract(poolAddress);
 
-	// Getting Pool info
+  // Getting Pool info
   const [
     underlyingAddress,
     tvlBN,
