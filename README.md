@@ -31,7 +31,7 @@ yarn add scaled-number
 import { ScaledNumber } from 'scaled-number';
 
 const scaledNumber = ScaledNumber.fromUnscaled(123);
-console.log(scaledNumber.mul(10));
+console.log(scaledNumber.mul(10).toString());
 ```
 
 ## Example Web3 Usage
