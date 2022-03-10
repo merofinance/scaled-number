@@ -6,8 +6,8 @@
 [![Issues][issues-img]][issues-url]
 [![Semantic Release][semantic-release-img]][semantic-release-url]
 
-[build-img]: https://github.com/backdfund/scaled-number/actions/workflows/release.yml/badge.svg
-[build-url]: https://github.com/backdfund/scaled-number/actions/workflows/release.yml
+[build-img]: https://github.com/backdfund/scaled-number/actions/workflows/cd.yml/badge.svg
+[build-url]: https://github.com/backdfund/scaled-number/actions/workflows/cd.yml
 [downloads-img]: https://img.shields.io/npm/dt/scaled-number
 [downloads-url]: https://www.npmtrends.com/scaled-number
 [npm-img]: https://img.shields.io/npm/v/scaled-number
