@@ -112,11 +112,13 @@ export const bigNumberToString = (
   decimals: number
 ): string => {
   let string = number.toString();
+  const prefix = string.substring(0, 1) === '-' ? '-' : '';
+  string = string.replace('-', '');
   while (string.length < decimals) string = `0${string}`;
   const decimalLocation = string.length - decimals;
   const whole = string.slice(0, decimalLocation) || '0';
   const fraction = string.slice(decimalLocation).replace(/0+$/, '');
-  return whole + (fraction ? `.${fraction}` : '');
+  return prefix + whole + (fraction ? `.${fraction}` : '');
 };
 
 export const stringToBigNumber = (
@@ -124,8 +126,9 @@ export const stringToBigNumber = (
   decimals: number
 ): BigNumber => {
   if (!value || value === '.') throw new Error('errors.invalidNumber');
-  if (value.substring(0, 1) === '-') throw new Error('errors.negativeNumber');
   value = value.replace(/,/g, '');
+  const multiplier = value.substring(0, 1) === '-' ? -1 : 1;
+  value = value.replace('-', '');
 
   const [num, power] = value.split('e');
 
@@ -143,8 +146,8 @@ export const stringToBigNumber = (
     }
 
     const base = BigNumber.from(10).pow(BigNumber.from(decimals));
-    return BigNumber.from(whole).mul(base).add(fraction);
+    return BigNumber.from(whole).mul(base).add(fraction).mul(multiplier);
   }
   const base = BigNumber.from(10).pow(BigNumber.from(-decimals));
-  return BigNumber.from(whole).div(base);
+  return BigNumber.from(whole).div(base).mul(multiplier);
 };
