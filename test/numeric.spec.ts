@@ -128,20 +128,6 @@ test('stringToBigNumber should accept scientific notation', () => {
   });
 });
 
-test('stringToBigNumber should error for negative numbers', () => {
-  const testCases = [
-    { value: '-100', decimals: 2 },
-    { value: '-0', decimals: 2 },
-    { value: '-1', decimals: 2 },
-    { value: (100 - 300).toString(), decimals: 2 },
-  ];
-  testCases.forEach(({ value, decimals }) => {
-    expect(() => stringToBigNumber(value, decimals)).toThrowError(
-      'errors.negativeNumber'
-    );
-  });
-});
-
 test('stringToBigNumber should error for invalid numbers', () => {
   const testCases = [
     { value: '', decimals: 2 },
