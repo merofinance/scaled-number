@@ -14,5 +14,5 @@ jobs:
         with:
           node-version: 16
       - run: yarn
-      - run: yarn run build --if-present
+      - run: yarn run build
       - run: yarn test
