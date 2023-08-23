@@ -1,11 +1,10 @@
-import { BigNumber } from '@ethersproject/bignumber';
 import {
-  bigNumberToString,
+  bigIntToString,
   formatCrypto,
   formatCurrency,
   formatPercent,
   numberToCompactCurrency,
-  stringToBigNumber,
+  stringToBigInt,
 } from './numeric';
 
 export interface PlainScaledNumber {
@@ -14,25 +13,25 @@ export interface PlainScaledNumber {
 }
 
 export class ScaledNumber {
-  private _value: BigNumber;
+  private _value: bigint;
 
   private _decimals: number;
 
-  constructor(value: BigNumber | null = BigNumber.from(0), decimals = 18) {
+  constructor(value: bigint | null = BigInt(0), decimals = 18) {
     this._decimals = decimals;
-    this._value = value || BigNumber.from(0);
+    this._value = value || BigInt(0);
   }
 
   static fromUnscaled(value: number | string = 0, decimals = 18): ScaledNumber {
     return new ScaledNumber(
-      stringToBigNumber(value.toString() || '0', decimals),
+      stringToBigInt(value.toString() || '0', decimals),
       decimals
     );
   }
 
   static fromPlain(value: PlainScaledNumber): ScaledNumber {
     if (!value) return new ScaledNumber();
-    return new ScaledNumber(BigNumber.from(value.value), value.decimals);
+    return new ScaledNumber(BigInt(value.value), value.decimals);
   }
 
   static isValid(value: number | string, decimals = 18): boolean {
@@ -44,7 +43,7 @@ export class ScaledNumber {
     }
   }
 
-  get value(): BigNumber {
+  get value(): bigint {
     return this._value;
   }
 
@@ -53,7 +52,7 @@ export class ScaledNumber {
   }
 
   private scale = (decimals: number) => {
-    return BigNumber.from(10).pow(decimals);
+    return BigInt(10) ** BigInt(decimals);
   };
 
   toPlain = (): PlainScaledNumber => {
@@ -63,79 +62,77 @@ export class ScaledNumber {
     };
   };
 
-  isZero = (): boolean => this.value.isZero();
+  isZero = (): boolean => this.value === BigInt(0);
 
-  isNegative = (): boolean => this.value.isNegative();
+  isNegative = (): boolean => this.value < BigInt(0);
 
   standardizeDecimals(other: ScaledNumber): ScaledNumber {
     if (this.decimals === other.decimals) return other;
     if (this.decimals >= other.decimals) {
       return new ScaledNumber(
-        other.value.mul(
-          BigNumber.from(10).pow(this._decimals - other.decimals)
-        ),
+        other.value * BigInt(10) ** BigInt(this._decimals - other.decimals),
         this.decimals
       );
     }
     return new ScaledNumber(
-      other.value.div(BigNumber.from(10).pow(other.decimals - this._decimals)),
+      other.value / BigInt(10) ** BigInt(other.decimals - this._decimals),
       this.decimals
     );
   }
 
   add(other: ScaledNumber): ScaledNumber {
     other = this.standardizeDecimals(other);
-    return new ScaledNumber(this.value.add(other.value), this.decimals);
+    return new ScaledNumber(this.value + other.value, this.decimals);
   }
 
   sub(other: ScaledNumber): ScaledNumber {
     other = this.standardizeDecimals(other);
-    return new ScaledNumber(this.value.sub(other.value), this.decimals);
+    return new ScaledNumber(this.value - other.value, this.decimals);
   }
 
   eq(other: ScaledNumber): boolean {
-    return this.value.eq(other.value) && this.decimals === other.decimals;
+    return this.value === other.value && this.decimals === other.decimals;
   }
 
   gt(other: ScaledNumber): boolean {
     other = this.standardizeDecimals(other);
-    return this.value.gt(other.value);
+    return this.value > other.value;
   }
 
   gte(other: ScaledNumber): boolean {
     other = this.standardizeDecimals(other);
-    return this.value.gte(other.value);
+    return this.value >= other.value;
   }
 
   lt(other: ScaledNumber): boolean {
     other = this.standardizeDecimals(other);
-    return this.value.lt(other.value);
+    return this.value < other.value;
   }
 
   lte(other: ScaledNumber): boolean {
     other = this.standardizeDecimals(other);
-    return this.value.lte(other.value);
+    return this.value <= other.value;
   }
 
   max(other: ScaledNumber): ScaledNumber {
     other = this.standardizeDecimals(other);
-    return this.value.gt(other.value) ? this : other;
+    return this.value > other.value ? this : other;
   }
 
   min(other: ScaledNumber): ScaledNumber {
     other = this.standardizeDecimals(other);
-    return this.value.lt(other.value) ? this : other;
+    return this.value < other.value ? this : other;
   }
 
   mul(value: number | string | ScaledNumber): ScaledNumber {
     const scaledValue =
       value instanceof ScaledNumber
         ? value.value
-        : stringToBigNumber(value.toString(), this.decimals);
+        : stringToBigInt(value.toString(), this.decimals);
     const scaledDecimals =
       value instanceof ScaledNumber ? value.decimals : this.decimals;
     return new ScaledNumber(
-      this.value.mul(scaledValue).div(this.scale(scaledDecimals)),
+      (this.value * scaledValue) / this.scale(scaledDecimals),
       this.decimals
     );
   }
@@ -144,17 +141,17 @@ export class ScaledNumber {
     const scaledValue =
       value instanceof ScaledNumber
         ? value.value
-        : stringToBigNumber(value.toString(), this.decimals);
-    if (scaledValue.isZero()) return new ScaledNumber();
+        : stringToBigInt(value.toString(), this.decimals);
+    if (scaledValue === BigInt(0)) return new ScaledNumber();
     const scaledDecimals =
       value instanceof ScaledNumber ? value.decimals : this.decimals;
     return new ScaledNumber(
-      this.value.mul(this.scale(scaledDecimals)).div(scaledValue),
+      (this.value * this.scale(scaledDecimals)) / scaledValue,
       this.decimals
     );
   }
 
-  toString = (): string => bigNumberToString(this._value, this._decimals);
+  toString = (): string => bigIntToString(this._value, this._decimals);
 
   toNumber = (): number => Number(this.toString());
 

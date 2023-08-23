@@ -38,7 +38,6 @@ console.log(scaledNumber.mul(10).toString());
 
 ```ts
 import { ScaledNumber } from 'scaled-number';
-import { BigNumber } from "ethers";
 import { getTokenDecimals, getContract, getPrice } from "helpers";
 
 export interface Pool {
@@ -103,18 +102,16 @@ export const logPoolInfo = async (pool: Pool): void => {
 
 ## Creating Scaled Number
 
-### From BigNumber
+### From biging
 
 ```ts
-new ScaledNumber(bigNumber: BigNumber, decimals?: number);
+new ScaledNumber(bigInt: bigint, decimals?: number);
 ```
 
 ```ts
 import { ScaledNumber } from 'scaled-number';
-import { BigNumber } from 'ethers';
 
-const bigNumber = BigNumber.from(123);
-const scaledNumber = new ScaledNumber(bigNumber);
+const scaledNumber = new ScaledNumber(BigInt(123));
 ```
 
 ### From Unscaled
@@ -349,7 +346,7 @@ console.log(sn.toPercent()); // 12.34%
 ### Value
 
 ```ts
-value: BigNumber;
+value: bigint;
 ```
 
 ```ts

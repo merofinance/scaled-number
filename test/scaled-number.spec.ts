@@ -1,4 +1,3 @@
-import { BigNumber } from '@ethersproject/bignumber';
 import { PlainScaledNumber, ScaledNumber } from '../src';
 import fc from 'fast-check';
 
@@ -27,18 +26,18 @@ test('should create from number', () => {
   testCases.forEach((value: number) => ScaledNumber.fromUnscaled(value));
 });
 
-test('should create from big number', () => {
+test('should create from bigint', () => {
   const testCases = [
-    BigNumber.from(1),
-    BigNumber.from(-1),
-    BigNumber.from(10000000000),
-    BigNumber.from(-10000000000),
-    BigNumber.from(123102),
-    BigNumber.from(-123102),
-    BigNumber.from(0),
+    BigInt(1),
+    BigInt(-1),
+    BigInt(10000000000),
+    BigInt(-10000000000),
+    BigInt(123102),
+    BigInt(-123102),
+    BigInt(0),
   ];
-  testCases.forEach((value: BigNumber) =>
-    expect(new ScaledNumber(value).value.eq(value)).toBeTruthy()
+  testCases.forEach((value: bigint) =>
+    expect(new ScaledNumber(value).value).toEqual(value)
   );
 });
 
@@ -159,41 +158,41 @@ test('should export as string from unscaled', () => {
 test('should export as string from scaled', () => {
   const testCases = [
     {
-      value: BigNumber.from('123000000000000000000'),
+      value: BigInt('123000000000000000000'),
       decimals: 18,
       expected: '123',
     },
     {
-      value: BigNumber.from('-123000000000000000000'),
+      value: BigInt('-123000000000000000000'),
       decimals: 18,
       expected: '-123',
     },
     {
-      value: BigNumber.from('123450000000000000000'),
+      value: BigInt('123450000000000000000'),
       decimals: undefined,
       expected: '123.45',
     },
     {
-      value: BigNumber.from('-123450000000000000000'),
+      value: BigInt('-123450000000000000000'),
       decimals: undefined,
       expected: '-123.45',
     },
     {
-      value: BigNumber.from('123450000000000000000'),
+      value: BigInt('123450000000000000000'),
       decimals: 6,
       expected: '123450000000000',
     },
     {
-      value: BigNumber.from('-123450000000000000000'),
+      value: BigInt('-123450000000000000000'),
       decimals: 6,
       expected: '-123450000000000',
     },
-    { value: BigNumber.from(1), decimals: 0, expected: '1' },
-    { value: BigNumber.from(-1), decimals: 0, expected: '-1' },
-    { value: BigNumber.from(1), decimals: 5, expected: '0.00001' },
-    { value: BigNumber.from(-1), decimals: 5, expected: '-0.00001' },
-    { value: BigNumber.from(134).div(10), decimals: 1, expected: '1.3' },
-    { value: BigNumber.from(-134).div(10), decimals: 1, expected: '-1.3' },
+    { value: BigInt(1), decimals: 0, expected: '1' },
+    { value: BigInt(-1), decimals: 0, expected: '-1' },
+    { value: BigInt(1), decimals: 5, expected: '0.00001' },
+    { value: BigInt(-1), decimals: 5, expected: '-0.00001' },
+    { value: BigInt(134) / BigInt(10), decimals: 1, expected: '1.3' },
+    { value: BigInt(-134) / BigInt(10), decimals: 1, expected: '-1.3' },
   ];
 
   testCases.forEach(({ value, decimals, expected }) => {
@@ -245,13 +244,13 @@ test('toPlain/fromPlain should be symmetric for floats', () => {
   );
 });
 
-test('toPlain/fromPlain should be symmetric for big numbers', () => {
+test('toPlain/fromPlain should be symmetric for bigints', () => {
   fc.assert(
     fc.property(
       fc.integer(),
       fc.integer({ min: 0, max: 27 }),
       (value: number, decimals: number) => {
-        const scaledNumber = new ScaledNumber(BigNumber.from(value), decimals);
+        const scaledNumber = new ScaledNumber(BigInt(value), decimals);
         const backAndForth = ScaledNumber.fromPlain(scaledNumber.toPlain());
         expect(scaledNumber.eq(backAndForth)).toBeTruthy();
       }

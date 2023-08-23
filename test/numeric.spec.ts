@@ -1,13 +1,36 @@
-import { BigNumber } from '@ethersproject/bignumber';
 import {
-  floatToBigNumber,
+  bigIntAbs,
+  bigIntToNumber,
+  floatToBigInt,
   formatCrypto,
   numberToCompactCurrency,
   scale,
-  stringToBigNumber,
+  stringToBigInt,
 } from '../src/numeric';
 
-test('should convert floats to big numbers', () => {
+test('should convert bigints to numbers', () => {
+  const testCases = [
+    { value: BigInt(10), expected: 10 },
+    { value: BigInt(0), expected: 0 },
+    { value: BigInt(-10), expected: -10 },
+  ];
+  testCases.forEach(({ value, expected }) => {
+    expect(bigIntToNumber(value)).toEqual(expected);
+  });
+});
+
+test('should get absolute values for bigints', () => {
+  const testCases = [
+    { value: BigInt(-10), expected: 10n },
+    { value: BigInt(10), expected: 10n },
+    { value: BigInt(0), expected: 0n },
+  ];
+  testCases.forEach(({ value, expected }) => {
+    expect(bigIntAbs(value)).toEqual(expected);
+  });
+});
+
+test('should convert floats to bigints', () => {
   const testCases = [
     { expected: scale(15683, 15), digits: 5, decimals: 18, value: 15.683 },
     { expected: scale(501340, 0), digits: 5, decimals: 6, value: 0.50134 },
@@ -15,8 +38,8 @@ test('should convert floats to big numbers', () => {
     { expected: scale(84180923, 18), digits: 5, decimals: 18, value: 84180923 },
   ];
   testCases.forEach(({ value, digits, decimals, expected }) => {
-    const actual = floatToBigNumber(value, decimals, digits);
-    expect(actual.sub(expected).abs().toNumber()).toEqual(0);
+    const actual: bigint = floatToBigInt(value, decimals, digits);
+    expect(bigIntAbs(actual - expected)).toEqual(BigInt(0));
   });
 });
 
@@ -65,91 +88,93 @@ test('should format numbers as crypto', () => {
   );
 });
 
-test('stringToBigNumber should convert strings to big numbers', () => {
+test('stringToBigInt should convert strings to bigints', () => {
   const testCases = [
-    { value: '1.23', decimals: 5, expected: BigNumber.from(123000) },
+    { value: '1.23', decimals: 5, expected: BigInt(123000) },
     {
       value: '0.000000000000000001',
       decimals: 18,
-      expected: BigNumber.from(1),
+      expected: BigInt(1),
     },
     {
       value: '0.0000000000000000001',
       decimals: 18,
-      expected: BigNumber.from(0),
+      expected: BigInt(0),
     },
     {
       value: '0.00000000000000000001',
       decimals: 20,
-      expected: BigNumber.from(1),
+      expected: BigInt(1),
     },
-    { value: '123.45', decimals: 1, expected: BigNumber.from(1234) },
-    { value: '28319', decimals: 4, expected: BigNumber.from(283190000) },
+    { value: '123.45', decimals: 1, expected: BigInt(1234) },
+    { value: '28319', decimals: 4, expected: BigInt(283190000) },
+    { value: '-1', decimals: 0, expected: -1n },
+    { value: '-123.918', decimals: 3, expected: -123918n },
     {
       value: '10000000000000000000000',
       decimals: 4,
-      expected: BigNumber.from(10).pow(26),
+      expected: BigInt(10) ** BigInt(26),
     },
   ];
   testCases.forEach(({ value, decimals, expected }) => {
-    expect(stringToBigNumber(value, decimals).eq(expected)).toBeTruthy();
+    expect(stringToBigInt(value, decimals)).toEqual(expected);
   });
 });
 
-test('stringToBigNumber should truncate', () => {
+test('stringToBigInt should truncate', () => {
   const testCases = [
-    { value: '1.2345', decimals: 2, expected: BigNumber.from(123) },
-    { value: '0.001', decimals: 2, expected: BigNumber.from(0) },
-    { value: '1.1', decimals: 2, expected: BigNumber.from('110') },
+    { value: '1.2345', decimals: 2, expected: BigInt(123) },
+    { value: '0.001', decimals: 2, expected: BigInt(0) },
+    { value: '1.1', decimals: 2, expected: BigInt('110') },
   ];
   testCases.forEach(({ value, decimals, expected }) => {
-    expect(stringToBigNumber(value, decimals).eq(expected)).toBeTruthy();
+    expect(stringToBigInt(value, decimals)).toEqual(expected);
   });
 });
 
-test('stringToBigNumber should accept scientific notation', () => {
+test('stringToBigInt should accept scientific notation', () => {
   const testCases = [
     {
       value: '3.456e11',
       decimals: 3,
-      expected: BigNumber.from(345600000000000),
+      expected: BigInt(345600000000000),
     },
-    { value: '934e5', decimals: 0, expected: BigNumber.from(93400000) },
-    { value: '12.45e0', decimals: 2, expected: BigNumber.from(1245) },
-    { value: '0.45e1', decimals: 4, expected: BigNumber.from(45000) },
+    { value: '934e5', decimals: 0, expected: BigInt(93400000) },
+    { value: '12.45e0', decimals: 2, expected: BigInt(1245) },
+    { value: '0.45e1', decimals: 4, expected: BigInt(45000) },
     {
       value: '10e2',
       decimals: 18,
-      expected: BigNumber.from(1000).mul(BigNumber.from(10).pow(18)),
+      expected: BigInt(1000) * BigInt(10) ** BigInt(18),
     },
   ];
   testCases.forEach(({ value, decimals, expected }) => {
-    expect(stringToBigNumber(value, decimals).eq(expected)).toBeTruthy();
+    expect(stringToBigInt(value, decimals)).toEqual(expected);
   });
 });
 
-test('stringToBigNumber should error for invalid numbers', () => {
+test('stringToBigInt should error for invalid numbers', () => {
   const testCases = [
     { value: '', decimals: 2 },
     { value: '.', decimals: 2 },
   ];
   testCases.forEach(({ value, decimals }) => {
-    expect(() => stringToBigNumber(value, decimals)).toThrowError(
+    expect(() => stringToBigInt(value, decimals)).toThrowError(
       'errors.invalidNumber'
     );
   });
 });
 
-test('stringToBigNumber should remove commars', () => {
+test('stringToBigInt should remove commars', () => {
   const testCases = [
-    { value: '1,000', decimals: 2, expected: BigNumber.from(100000) },
+    { value: '1,000', decimals: 2, expected: BigInt(100000) },
     {
       value: '265,232,123.121',
       decimals: 6,
-      expected: BigNumber.from(265232123121000),
+      expected: BigInt(265232123121000),
     },
   ];
   testCases.forEach(({ value, decimals, expected }) => {
-    expect(stringToBigNumber(value, decimals).eq(expected)).toBeTruthy();
+    expect(stringToBigInt(value, decimals)).toEqual(expected);
   });
 });

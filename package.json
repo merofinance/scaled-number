@@ -1,6 +1,6 @@
 {
   "name": "scaled-number",
-  "version": "1.0.1",
+  "version": "2.0.0",
   "description": "A class for managing large numbers with a decimal scale, useful for web3 development",
   "main": "./lib/src/index.js",
   "files": [
@@ -33,9 +33,6 @@
     "integer",
     "bigint",
     "big integer",
-    "bignumber",
-    "big-number",
-    "bignumbers",
     "arithmetic",
     "operations"
   ],
@@ -69,8 +66,5 @@
     "branches": [
       "main"
     ]
-  },
-  "dependencies": {
-    "@ethersproject/bignumber": "^5.5.0"
   }
 }
