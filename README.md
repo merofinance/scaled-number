@@ -102,7 +102,7 @@ export const logPoolInfo = async (pool: Pool): void => {
 
 ## Creating Scaled Number
 
-### From biging
+### From bigint
 
 ```ts
 new ScaledNumber(bigInt: bigint, decimals?: number);
