@@ -114,6 +114,19 @@ import { ScaledNumber } from 'scaled-number';
 const scaledNumber = new ScaledNumber(BigInt(123));
 ```
 
+### From BigNumber
+
+```ts
+new ScaledNumber(bigNumber: BigNumber, decimals?: number);
+```
+
+```ts
+import { ScaledNumber } from 'scaled-number';
+import { BigNumber } from '@ethersproject/bignumber';
+
+const scaledNumber = new ScaledNumber(BigNumber.from(123));
+```
+
 ### From Unscaled
 
 ```ts
