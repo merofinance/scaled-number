@@ -68,6 +68,6 @@
     ]
   },
   "dependencies": {
-    "bignumber.js": "^9.1.2"
+    "@ethersproject/bignumber": "^5.7.0"
   }
 }

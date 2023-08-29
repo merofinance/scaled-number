@@ -1,4 +1,4 @@
-import BigNumber from 'bignumber.js';
+import { BigNumber } from '@ethersproject/bignumber';
 import { PlainScaledNumber, ScaledNumber } from '../src';
 import fc from 'fast-check';
 
@@ -30,7 +30,7 @@ test('should create from number', () => {
 test('should create from BigNumber', () => {
   const testCases = [
     {
-      value: BigNumber('100000000'),
+      value: BigNumber.from('100000000'),
       decimals: 8,
       expected: ScaledNumber.fromPlain({
         value: '100000000',
@@ -38,7 +38,7 @@ test('should create from BigNumber', () => {
       }),
     },
     {
-      value: BigNumber('-100000000'),
+      value: BigNumber.from('-100000000'),
       decimals: 8,
       expected: ScaledNumber.fromPlain({
         value: '-100000000',
@@ -46,7 +46,7 @@ test('should create from BigNumber', () => {
       }),
     },
     {
-      value: BigNumber('1'),
+      value: BigNumber.from('1'),
       decimals: 0,
       expected: ScaledNumber.fromPlain({
         value: '1',
@@ -54,7 +54,7 @@ test('should create from BigNumber', () => {
       }),
     },
     {
-      value: BigNumber('-1'),
+      value: BigNumber.from('-1'),
       decimals: 0,
       expected: ScaledNumber.fromPlain({
         value: '-1',
@@ -62,7 +62,7 @@ test('should create from BigNumber', () => {
       }),
     },
     {
-      value: BigNumber('12910239123'),
+      value: BigNumber.from('12910239123'),
       decimals: undefined,
       expected: ScaledNumber.fromPlain({
         value: '12910239123',

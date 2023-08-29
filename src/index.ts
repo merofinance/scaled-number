@@ -1,3 +1,4 @@
+import { BigNumberish } from '@ethersproject/bignumber';
 import {
   bigIntToString,
   formatCrypto,
@@ -6,7 +7,6 @@ import {
   numberToCompactCurrency,
   stringToBigInt,
 } from './numeric';
-import { BigNumber } from 'bignumber.js';
 
 export interface PlainScaledNumber {
   value: string;
@@ -18,13 +18,16 @@ export class ScaledNumber {
 
   private _decimals: number;
 
-  constructor(value: bigint | null | BigNumber = BigInt(0), decimals = 18) {
-    // Handle BigNumber
-    if (value instanceof BigNumber) {
+  constructor(value: bigint | null | BigNumberish = BigInt(0), decimals = 18) {
+    // if value is null, set to 0
+    if (value === null) value = BigInt(0);
+
+    // Handle BigNumberish
+    if (typeof value !== 'bigint') {
       value = stringToBigInt(value.toString(), 0);
     }
 
-    // Handle biging
+    // Handle bigint
     this._decimals = decimals;
     this._value = value || BigInt(0);
   }
