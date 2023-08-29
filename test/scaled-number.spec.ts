@@ -1,3 +1,4 @@
+import BigNumber from 'bignumber.js';
 import { PlainScaledNumber, ScaledNumber } from '../src';
 import fc from 'fast-check';
 
@@ -24,6 +25,56 @@ test('should create from number', () => {
     1, -1, 12.34, -12.34, 0.123, -0.123, 1010020102102, -1010020102102,
   ];
   testCases.forEach((value: number) => ScaledNumber.fromUnscaled(value));
+});
+
+test('should create from BigNumber', () => {
+  const testCases = [
+    {
+      value: BigNumber('100000000'),
+      decimals: 8,
+      expected: ScaledNumber.fromPlain({
+        value: '100000000',
+        decimals: 8,
+      }),
+    },
+    {
+      value: BigNumber('-100000000'),
+      decimals: 8,
+      expected: ScaledNumber.fromPlain({
+        value: '-100000000',
+        decimals: 8,
+      }),
+    },
+    {
+      value: BigNumber('1'),
+      decimals: 0,
+      expected: ScaledNumber.fromPlain({
+        value: '1',
+        decimals: 0,
+      }),
+    },
+    {
+      value: BigNumber('-1'),
+      decimals: 0,
+      expected: ScaledNumber.fromPlain({
+        value: '-1',
+        decimals: 0,
+      }),
+    },
+    {
+      value: BigNumber('12910239123'),
+      decimals: undefined,
+      expected: ScaledNumber.fromPlain({
+        value: '12910239123',
+        decimals: 18,
+      }),
+    },
+  ];
+  testCases.forEach(({ value, decimals, expected }) => {
+    const scaledNumber = new ScaledNumber(value, decimals);
+    expect(scaledNumber.value).toEqual(expected.value);
+    expect(scaledNumber.decimals).toEqual(expected.decimals);
+  });
 });
 
 test('should create from bigint', () => {

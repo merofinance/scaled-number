@@ -6,6 +6,7 @@ import {
   numberToCompactCurrency,
   stringToBigInt,
 } from './numeric';
+import { BigNumber } from 'bignumber.js';
 
 export interface PlainScaledNumber {
   value: string;
@@ -17,7 +18,13 @@ export class ScaledNumber {
 
   private _decimals: number;
 
-  constructor(value: bigint | null = BigInt(0), decimals = 18) {
+  constructor(value: bigint | null | BigNumber = BigInt(0), decimals = 18) {
+    // Handle BigNumber
+    if (value instanceof BigNumber) {
+      value = stringToBigInt(value.toString(), 0);
+    }
+
+    // Handle biging
     this._decimals = decimals;
     this._value = value || BigInt(0);
   }
